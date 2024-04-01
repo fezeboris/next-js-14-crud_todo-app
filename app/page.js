@@ -1,7 +1,7 @@
 "use client";
 import Todo from "@/components/Todo";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 export default function Home() {
@@ -22,11 +22,21 @@ export default function Home() {
 
       toast.success(res.data.message);
       setFormData({ title: "", description: "" });
+      await handleFetchTodo();
     } catch (error) {
       console.log(error);
       toast.error("Failed to add Todo");
     }
   };
+  const [todoData, setTodoData] = useState([]);
+  const handleFetchTodo = async () => {
+    const res = await axios("/api");
+    setTodoData(res.data.todos);
+  };
+  useEffect(() => {
+    handleFetchTodo();
+  }, []);
+  console.log(todoData);
   return (
     <div className="max-w-[800px] mx-auto">
       <ToastContainer />
@@ -82,7 +92,17 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            <Todo />
+            {todoData &&
+              todoData.map((todo, index) => (
+                <Todo
+                  key={todo}
+                  title={todo.title}
+                  id={index}
+                  description={todo.description}
+                  isComplete={todo.isComplete}
+                  mongoId={todo._id}
+                />
+              ))}
           </tbody>
         </table>
       </div>
