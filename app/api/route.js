@@ -16,3 +16,14 @@ export async function POST(request, response) {
   await TodoModel.create({ title, description });
   return NextResponse.json({ message: "Todo created" });
 }
+export async function DELETE(request, response) {
+  const mongoId = await request.nextUrl.searchParams.get("mongoId");
+  await TodoModel.findByIdAndDelete(mongoId);
+  return NextResponse.json({ message: "Todo deleted" });
+}
+export async function PUT(request, response) {
+  const mongoId = await request.nextUrl.searchParams.get("mongoId");
+
+  await TodoModel.findByIdAndUpdate(mongoId, { $set: { isCompleted: true } });
+  return NextResponse.json({ message: "Todo Completed" });
+}

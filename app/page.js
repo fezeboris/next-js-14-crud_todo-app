@@ -29,9 +29,28 @@ export default function Home() {
     }
   };
   const [todoData, setTodoData] = useState([]);
+  const reversedTodoArray = todoData.slice().reverse();
   const handleFetchTodo = async () => {
     const res = await axios("/api");
     setTodoData(res.data.todos);
+  };
+  const handleDeleteTodo = async (id) => {
+    const res = await axios.delete("/api", {
+      params: { mongoId: id },
+    });
+    toast.success(res.data.message);
+    handleFetchTodo();
+  };
+  const handleTodoComplete = async (id) => {
+    const res = await axios.put(
+      "/api",
+      {},
+      {
+        params: { mongoId: id },
+      }
+    );
+    toast.success(res.data.message);
+    handleFetchTodo();
   };
   useEffect(() => {
     handleFetchTodo();
@@ -92,15 +111,17 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {todoData &&
-              todoData.map((todo, index) => (
+            {reversedTodoArray &&
+              reversedTodoArray.map((todo, index) => (
                 <Todo
                   key={todo}
                   title={todo.title}
                   id={index}
                   description={todo.description}
-                  isComplete={todo.isComplete}
+                  isCompleted={todo.isCompleted}
                   mongoId={todo._id}
+                  handleDeleteTodo={handleDeleteTodo}
+                  handleTodoComplete={handleTodoComplete}
                 />
               ))}
           </tbody>
